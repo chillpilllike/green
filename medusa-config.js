@@ -78,6 +78,7 @@ const plugins = [
           indexSettings: {
             searchableAttributes: ["title", "description", "variant_sku", "brand"],
             displayedAttributes: [
+              "id"
               "title",
               "description",
               "variant_sku",
