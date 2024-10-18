@@ -121,13 +121,6 @@ const plugins = [
       write_key: process.env.SEGMENT_WRITE_KEY,
     },
   },
-  {
-    resolve: 'medusa-source-shopify',
-    options: {
-      domain: process.env.SHOPIFY_DOMAIN,
-      password: process.env.SHOPIFY_PASSWORD,
-    },
-  },
 ];
 
 const modules = {
