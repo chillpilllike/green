@@ -74,7 +74,7 @@ const plugins = [
         apiKey: process.env.MEILISEARCH_API_KEY,
       },
       settings: {
-        greenproducts: {
+        products: {
           indexSettings: {
             searchableAttributes: ["title", "description", "variant_sku", "brand"],
             displayedAttributes: [
