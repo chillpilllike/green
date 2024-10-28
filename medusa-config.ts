@@ -6,9 +6,6 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 module.exports = defineConfig({
   projectConfig: {
      databaseUrl: process.env.DATABASE_URL,
-    database: {
-      ssl: process.env.DATABASE_SSL === 'true', // Enable or disable SSL based on environment variable
-    },
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
