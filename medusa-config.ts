@@ -36,12 +36,6 @@ module.exports = defineConfig({
       },
     },
     {
-      resolve: "@medusajs/medusa/lock-redis",
-      options: {
-        redisUrl: process.env.LOCK_REDIS_URL,
-      },
-    },
-    {
       resolve: "@medusajs/medusa/file",
       options: {
         providers: [
