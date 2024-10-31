@@ -5,7 +5,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 module.exports = defineConfig({
   projectConfig: {
-     databaseUrl: process.env.DATABASE_URL,
+    databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -82,6 +82,35 @@ module.exports = defineConfig({
             },
           },
         ],
+      },
+    },
+    {
+      resolve: `medusa-plugin-meilisearch`,
+      options: {
+        config: {
+          host: process.env.MEILISEARCH_HOST,
+          apiKey: process.env.MEILISEARCH_API_KEY,
+        },
+        settings: {
+          products: {
+            indexSettings: {
+              searchableAttributes: [
+                "title", 
+                "description",
+                "variant_sku",
+              ],
+              displayedAttributes: [
+                "id", 
+                "title", 
+                "description", 
+                "variant_sku", 
+                "thumbnail", 
+                "handle",
+              ],
+            },
+            primaryKey: "id",
+          },
+        },
       },
     },
   ]
