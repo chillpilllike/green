@@ -88,7 +88,6 @@ module.exports = defineConfig({
     {
   resolve: MeiliSearchSubscriber,
   options: {},
-}
-    },
+},
   ]
 });
