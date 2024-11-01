@@ -1,12 +1,13 @@
+register the subscriber in my following code of medusa-config.ts:
+
 import { loadEnv, defineConfig } from '@medusajs/framework/utils';
 import { Modules } from "@medusajs/framework/utils";
-import MeiliSearchSubscriber from "./src/subscribers/meilisearch-subscriber";
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 module.exports = defineConfig({
   projectConfig: {
-    databaseUrl: process.env.DATABASE_URL,
+     databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -85,8 +86,5 @@ module.exports = defineConfig({
         ],
       },
     },
-  ],
-  subscribers: [
-    MeiliSearchSubscriber, // Ensure your MeiliSearchSubscriber is listed here
   ]
 });
