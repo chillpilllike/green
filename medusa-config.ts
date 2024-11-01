@@ -1,5 +1,3 @@
-register the subscriber in my following code of medusa-config.ts:
-
 import { loadEnv, defineConfig } from '@medusajs/framework/utils';
 import { Modules } from "@medusajs/framework/utils";
 
