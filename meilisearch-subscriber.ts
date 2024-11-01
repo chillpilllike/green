@@ -1,52 +1,50 @@
-import { BaseService } from "medusa-interfaces";
-import { ProductService } from "@medusajs/medusa/dist/services";
-import MeiliSearch from 'meilisearch';
+import { EventBusService } from "@medusajs/medusa";
+import { MeiliSearch } from "meilisearch";
 
-class MeiliSearchSubscriber extends BaseService {
-  private productService_: ProductService;
-  private meiliClient_: MeiliSearch;
+class MeiliSearchSubscriber {
+  private eventBus_: EventBusService;
+  private meiliClient: MeiliSearch;
 
-  constructor({ productService }: { productService: ProductService }) {
-    super();
-
-    this.productService_ = productService;
-    this.meiliClient_ = new MeiliSearch({
-      host: process.env.MEILISEARCH_HOST,
-      apiKey: process.env.MEILISEARCH_API_KEY,
+  constructor({ eventBusService }: { eventBusService: EventBusService }) {
+    this.eventBus_ = eventBusService;
+    this.meiliClient = new MeiliSearch({
+      host: process.env.MEILISEARCH_HOST!,
+      apiKey: process.env.MEILISEARCH_API_KEY!,
     });
 
-    // Event Subscriptions
-    this.subscribe("product.created", this.handleProductCreated.bind(this));
-    this.subscribe("product.updated", this.handleProductUpdated.bind(this));
-    this.subscribe("product.deleted", this.handleProductDeleted.bind(this));
+    // Subscribe to product events
+    this.eventBus_.subscribe("product.created", this.indexProduct.bind(this));
+    this.eventBus_.subscribe("product.updated", this.indexProduct.bind(this));
+    this.eventBus_.subscribe("product.deleted", this.removeProduct.bind(this));
   }
 
-  async handleProductCreated({ id }: { id: string }) {
-    const product = await this.productService_.retrieve(id);
-    await this.meiliClient_.index("products").addDocuments([{
+  // Helper to format and index product data
+  async indexProduct(product) {
+    const formattedProduct = {
       id: product.id,
       title: product.title,
       description: product.description,
-      variant_sku: product.variants.map(v => v.sku),
+      variant_sku: product.variants ? product.variants.map((v: any) => v.sku) : [],
       thumbnail: product.thumbnail,
       handle: product.handle,
-    }]);
+    };
+
+    try {
+      await this.meiliClient.index("products").addDocuments([formattedProduct]);
+      console.log(`Indexed product ${product.id}`);
+    } catch (error) {
+      console.error(`Error indexing product ${product.id}:`, error);
+    }
   }
 
-  async handleProductUpdated({ id }: { id: string }) {
-    const product = await this.productService_.retrieve(id);
-    await this.meiliClient_.index("products").updateDocuments([{
-      id: product.id,
-      title: product.title,
-      description: product.description,
-      variant_sku: product.variants.map(v => v.sku),
-      thumbnail: product.thumbnail,
-      handle: product.handle,
-    }]);
-  }
-
-  async handleProductDeleted({ id }: { id: string }) {
-    await this.meiliClient_.index("products").deleteDocument(id);
+  // Remove product from Meilisearch index
+  async removeProduct(data) {
+    try {
+      await this.meiliClient.index("products").deleteDocument(data.id);
+      console.log(`Removed product ${data.id} from index`);
+    } catch (error) {
+      console.error(`Error removing product ${data.id}:`, error);
+    }
   }
 }
 
