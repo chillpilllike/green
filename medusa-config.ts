@@ -1,5 +1,6 @@
 import { loadEnv, defineConfig } from '@medusajs/framework/utils';
 import { Modules } from "@medusajs/framework/utils";
+import MeiliSearchSubscriber from "./src/subscribers/meilisearch-subscriber";
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
@@ -83,6 +84,11 @@ module.exports = defineConfig({
           },
         ],
       },
+    },
+    {
+  resolve: MeiliSearchSubscriber,
+  options: {},
+}
     },
   ]
 });
