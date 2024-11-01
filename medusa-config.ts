@@ -6,7 +6,7 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 module.exports = defineConfig({
   projectConfig: {
-     databaseUrl: process.env.DATABASE_URL,
+    databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -85,11 +85,8 @@ module.exports = defineConfig({
         ],
       },
     },
-    {
-      resolve: MeiliSearchSubscriber, // Register the MeiliSearchSubscriber module here
-      options: {
-        // You may add options specific to the subscriber if necessary
-      },
-    },
+  ],
+  subscribers: [
+    MeiliSearchSubscriber, // Ensure your MeiliSearchSubscriber is listed here
   ]
 });
