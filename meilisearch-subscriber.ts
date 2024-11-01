@@ -1,5 +1,6 @@
 import { EventBusService } from "@medusajs/medusa";
 import { MeiliSearch } from "meilisearch";
+export default MeiliSearchSubscriber;
 
 class MeiliSearchSubscriber {
   private eventBus_: EventBusService;
