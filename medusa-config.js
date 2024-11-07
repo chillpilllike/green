@@ -1,40 +1,92 @@
-const { defineConfig, loadEnv } = require("@medusajs/utils")
+import { loadEnv, defineConfig } from '@medusajs/framework/utils';
+import { Modules } from "@medusajs/framework/utils";
 
-loadEnv(process.env.NODE_ENV || "development", process.cwd())
+loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
-// CORS when consuming Medusa from admin
-// Medusa's docs are added for a better learning experience. Feel free to remove.
-const ADMIN_CORS = `${
-  process.env.ADMIN_CORS?.length
-    ? `${process.env.ADMIN_CORS},`
-    : "http://localhost:7000,http://localhost:7001,"
-}https://docs.medusajs.com,https://medusa-docs-v2-git-docs-v2-medusajs.vercel.app,https://medusa-resources-git-docs-v2-medusajs.vercel.app`
-
-// CORS to avoid issues when consuming Medusa from a client
-// Medusa's docs are added for a better learning experience. Feel free to remove.
-const STORE_CORS = `${
-  process.env.STORE_CORS?.length
-    ? `${process.env.STORE_CORS},`
-    : "http://localhost:8000,"
-}https://docs.medusajs.com,https://medusa-docs-v2-git-docs-v2-medusajs.vercel.app,https://medusa-resources-git-docs-v2-medusajs.vercel.app`
-
-const DATABASE_URL =
-  process.env.DATABASE_URL || "postgres://medusa:password@localhost/medusa"
-
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379"
-
-export default defineConfig({
-  plugins: [
-    `medusa-fulfillment-manual`,
-    `medusa-payment-manual`,
+module.exports = defineConfig({
+  projectConfig: {
+    databaseUrl: process.env.DATABASE_URL,
+    http: {
+      storeCors: process.env.STORE_CORS!,
+      adminCors: process.env.ADMIN_CORS!,
+      authCors: process.env.AUTH_CORS!,
+      jwtSecret: process.env.JWT_SECRET || "supersecret",
+      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+    }
+  },
+  modules: [
     {
-      resolve: `@medusajs/file-local`,
-      options: {
-        upload_dir: "uploads",
+      resolve: "@medusajs/medusa/cache-redis",
+      options: { 
+        redisUrl: process.env.CACHE_REDIS_URL,
       },
     },
     {
-      resolve: `medusa-plugin-meilisearch`,
+      resolve: "@medusajs/medusa/workflow-engine-redis",
+      options: {
+        redis: {
+          url: process.env.WE_REDIS_URL,
+        },
+      },
+    },
+    {
+      resolve: "@medusajs/medusa/event-bus-redis",
+      options: { 
+        redisUrl: process.env.EVENTS_REDIS_URL,
+      },
+    },
+    {
+      resolve: "@medusajs/medusa/file",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/file-s3",
+            id: "s3",
+            options: {
+              file_url: process.env.S3_FILE_URL,
+              access_key_id: process.env.S3_ACCESS_KEY_ID,
+              secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
+              region: process.env.S3_REGION,
+              bucket: process.env.S3_BUCKET,
+              endpoint: process.env.S3_ENDPOINT,
+            },
+          },
+        ],
+      },
+    },
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/notification-sendgrid",
+            id: "sendgrid",
+            options: {
+              channels: ["email"],
+              api_key: process.env.SENDGRID_API_KEY,
+              from: process.env.SENDGRID_FROM,
+            },
+          },
+        ],
+      },
+    },
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/payment-stripe",
+            id: "stripe",
+            options: {
+              apiKey: process.env.STRIPE_API_KEY,
+            },
+          },
+        ],
+      },
+    },
+    {
+      // Meilisearch plugin configuration
+      resolve: "medusa-plugin-meilisearch",
       options: {
         config: {
           host: process.env.MEILISEARCH_HOST,
@@ -43,34 +95,27 @@ export default defineConfig({
         settings: {
           products: {
             indexSettings: {
-              searchableAttributes: ["title", "description", "variant_sku"],
-              displayedAttributes: [
-                "id",
-                "title",
+              searchableAttributes: [
+                "title", 
                 "description",
                 "variant_sku",
-                "thumbnail",
+              ],
+              displayedAttributes: [
+                "title", 
+                "description", 
+                "variant_sku", 
+                "thumbnail", 
                 "handle",
               ],
             },
             primaryKey: "id",
+            transformer: (product) => ({
+              id: product.id,
+              // other attributes...
+            }),
           },
         },
       },
     },
-  ],
-  admin: {
-    backendUrl: "http://localhost:9000",
-  },
-  projectConfig: {
-    databaseUrl: DATABASE_URL,
-    http: {
-      storeCors: STORE_CORS,
-      adminCors: ADMIN_CORS,
-      authCors: process.env.AUTH_CORS || ADMIN_CORS,
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
-    },
-    redisUrl: REDIS_URL,
-  },
-})
+  ]
+});
