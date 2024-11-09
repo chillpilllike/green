@@ -1,10 +1,9 @@
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { Metadata } from "next"
+import { notFound } from "next/navigation"
 
-import { retrieveCart } from '@lib/data/cart'
-import { getProductByHandle, getProductsList } from '@lib/data/products'
-import { getRegion, listRegions } from '@lib/data/regions'
-import ProductTemplate from '@modules/products/templates'
+import ProductTemplate from "@modules/products/templates"
+import { getRegion, listRegions } from "@lib/data/regions"
+import { getProductByHandle, getProductsList } from "@lib/data/products"
 
 type Props = {
   params: { countryCode: string; handle: string }
@@ -58,10 +57,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${product.title} | Solace Medusa Starter`,
+    title: `${product.title} | Medusa Store`,
     description: `${product.title}`,
     openGraph: {
-      title: `${product.title} | Solace Medusa Starter`,
+      title: `${product.title} | Medusa Store`,
       description: `${product.title}`,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
@@ -76,18 +75,14 @@ export default async function ProductPage({ params }: Props) {
   }
 
   const pricedProduct = await getProductByHandle(params.handle, region.id)
-
   if (!pricedProduct) {
     notFound()
   }
-
-  const cart = await retrieveCart()
 
   return (
     <ProductTemplate
       product={pricedProduct}
       region={region}
-      cartItems={cart?.items}
       countryCode={params.countryCode}
     />
   )
