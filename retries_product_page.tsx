@@ -7,16 +7,24 @@ import { getProductByHandle } from "@lib/data/products";
 import { sdk } from "@lib/config";
 
 type Props = {
-  params: Promise<{ countryCode: string; handle: string }>;
+  params: { countryCode: string; handle: string };
 };
 
+// Define a type for the fetch function
+type FetchFunction<T> = (...args: any[]) => Promise<T>;
+
 // Utility function for retries
-async function fetchWithRetries(fetchFn, args = [], retries = 3, delay = 1000) {
+async function fetchWithRetries<T>(
+  fetchFn: FetchFunction<T>,
+  args: any[] = [],
+  retries = 3,
+  delay = 1000
+): Promise<T> {
   for (let i = 0; i < retries; i++) {
     try {
       return await fetchFn(...args);
     } catch (error) {
-      console.error(`Attempt ${i + 1} failed: ${error.message}`);
+      console.error(`Attempt ${i + 1} failed: ${(error as Error).message}`);
       if (i < retries - 1) {
         await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
@@ -24,11 +32,12 @@ async function fetchWithRetries(fetchFn, args = [], retries = 3, delay = 1000) {
       }
     }
   }
+  throw new Error("All retries failed.");
 }
 
 export async function generateStaticParams() {
   try {
-    const countryCodes = await fetchWithRetries(listRegions, [], 3, 1000).then((regions) =>
+    const countryCodes = await fetchWithRetries(listRegions, []).then((regions) =>
       regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
     );
 
@@ -38,9 +47,7 @@ export async function generateStaticParams() {
 
     const { products } = await fetchWithRetries(
       sdk.store.product.list,
-      [{ fields: "handle" }, { next: { tags: ["products"] } }],
-      3,
-      1000
+      [{ fields: "handle" }, { next: { tags: ["products"] } }]
     );
 
     return countryCodes
@@ -63,15 +70,14 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const params = await props.params;
-  const { handle } = params;
+  const { countryCode, handle } = props.params;
 
-  const region = await fetchWithRetries(getRegion, [params.countryCode], 3, 1000);
+  const region = await fetchWithRetries(getRegion, [countryCode]);
   if (!region) {
     notFound();
   }
 
-  const product = await fetchWithRetries(getProductByHandle, [handle, region.id], 3, 1000);
+  const product = await fetchWithRetries(getProductByHandle, [handle, region.id]);
   if (!product) {
     notFound();
   }
@@ -88,19 +94,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage(props: Props) {
-  const params = await props.params;
+  const { countryCode, handle } = props.params;
 
-  const region = await fetchWithRetries(getRegion, [params.countryCode], 3, 1000);
+  const region = await fetchWithRetries(getRegion, [countryCode]);
   if (!region) {
     notFound();
   }
 
-  const pricedProduct = await fetchWithRetries(
-    getProductByHandle,
-    [params.handle, region.id],
-    3,
-    1000
-  );
+  const pricedProduct = await fetchWithRetries(getProductByHandle, [handle, region.id]);
   if (!pricedProduct) {
     notFound();
   }
@@ -109,7 +110,7 @@ export default async function ProductPage(props: Props) {
     <ProductTemplate
       product={pricedProduct}
       region={region}
-      countryCode={params.countryCode}
+      countryCode={countryCode}
     />
   );
 }
