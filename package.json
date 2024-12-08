@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.0.0",
-    "@mikro-orm/cli": "5.9.7",
+    "@mikro-orm/cli": "latest",
     "@swc/core": "1.5.7",
     "@swc/jest": "^0.2.36",
     "@types/jest": "^29.5.13",
