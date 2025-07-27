@@ -22,15 +22,12 @@ export default defineConfig({
   },
 
   modules: [
-    // Redis Cache
     {
       resolve: '@medusajs/medusa/cache-redis',
       options: {
         redisUrl: process.env.CACHE_REDIS_URL,
       },
     },
-
-    // Workflow Engine Redis
     {
       resolve: '@medusajs/medusa/workflow-engine-redis',
       options: {
@@ -39,16 +36,12 @@ export default defineConfig({
         },
       },
     },
-
-    // Event Bus Redis
     {
       resolve: '@medusajs/medusa/event-bus-redis',
       options: {
         redisUrl: process.env.EVENTS_REDIS_URL,
       },
     },
-
-    // File Storage (S3)
     {
       resolve: '@medusajs/medusa/file',
       options: {
@@ -68,8 +61,6 @@ export default defineConfig({
         ],
       },
     },
-
-    // Notification Provider (SendGrid)
     {
       resolve: '@medusajs/medusa/notification',
       options: {
@@ -86,8 +77,6 @@ export default defineConfig({
         ],
       },
     },
-
-    // Payment Provider (Stripe)
     {
       resolve: '@medusajs/medusa/payment',
       options: {
@@ -102,10 +91,9 @@ export default defineConfig({
         ],
       },
     },
-
-    // Index Module
     {
       resolve: '@medusajs/index',
+      options: {},
     },
   ],
 })
