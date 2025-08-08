@@ -1,4 +1,6 @@
+// medusa-config.ts
 import { loadEnv, defineConfig } from '@medusajs/framework/utils'
+import type { MeilisearchPluginOptions } from '@rokmohar/medusa-plugin-meilisearch'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
@@ -31,9 +33,7 @@ export default defineConfig({
     {
       resolve: '@medusajs/medusa/workflow-engine-redis',
       options: {
-        redis: {
-          url: process.env.WE_REDIS_URL,
-        },
+        redis: { url: process.env.WE_REDIS_URL },
       },
     },
     {
@@ -94,6 +94,48 @@ export default defineConfig({
     {
       resolve: '@medusajs/index',
       options: {},
+    },
+  ],
+
+  // ⬇️ New: Plugins section with Meilisearch
+  plugins: [
+    {
+      resolve: '@rokmohar/medusa-plugin-meilisearch',
+      options: {
+        config: {
+          host: process.env.MEILISEARCH_HOST ?? '',
+          apiKey: process.env.MEILISEARCH_API_KEY ?? '',
+        },
+        settings: {
+          // index name = key ("products")
+          products: {
+            type: 'products',
+            enabled: true,
+            fields: ['id', 'title', 'description', 'handle', 'variant_sku', 'thumbnail'],
+            indexSettings: {
+              searchableAttributes: ['title', 'description', 'variant_sku'],
+              displayedAttributes: [
+                'id',
+                'handle',
+                'title',
+                'description',
+                'variant_sku',
+                'thumbnail',
+              ],
+              filterableAttributes: ['id', 'handle'],
+            },
+            primaryKey: 'id',
+            // transformer: (product) => ({ id: product.id }),
+          },
+        },
+        i18n: {
+          // using field-suffix strategy
+          strategy: 'field-suffix',
+          languages: ['en', 'fr', 'de'],
+          defaultLanguage: 'en',
+          translatableFields: ['title', 'description'],
+        },
+      } satisfies MeilisearchPluginOptions,
     },
   ],
 })
