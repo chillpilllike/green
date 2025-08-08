@@ -21,7 +21,7 @@ export default defineConfig({
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
 
-  // ✅ All Plugins Combined
+  // ✅ Plugins
   plugins: [
     {
       resolve: '@rsc-labs/medusa-products-bought-together-v2',
@@ -29,6 +29,7 @@ export default defineConfig({
     },
     {
       resolve: '@rsc-labs/medusa-wishlist',
+      options: {},
     },
     {
       resolve: '@lambdacurry/medusa-product-reviews',
@@ -40,10 +41,13 @@ export default defineConfig({
       resolve: '@rsc-labs/medusa-store-analytics-v2',
       options: {},
     },
-    'medusa-plugin-razorpay-v2', // Razorpay plugin reference
+    {
+      resolve: 'medusa-plugin-razorpay-v2',
+      options: {},
+    },
   ],
 
-  // ✅ All Modules Combined
+  // ✅ Modules
   modules: [
     {
       resolve: '@medusajs/medusa/cache-redis',
