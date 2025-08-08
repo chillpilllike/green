@@ -36,7 +36,6 @@
   "awilix": "^8.0.1",
   "pg": "^8.13.0",
   "@medusajs/index": "2.8.8",
-  "@rsc-labs/medusa-products-bought-together-v2": "latest",
   "@rsc-labs/medusa-wishlist": "latest",
   "@lambdacurry/medusa-product-reviews": "latest",
   "@rsc-labs/medusa-store-analytics-v2": "latest",
