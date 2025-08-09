@@ -16,10 +16,10 @@ export default defineConfig({
     },
   },
 
-  admin: {
-    disable: process.env.DISABLE_MEDUSA_ADMIN === 'true',
-    backendUrl: process.env.MEDUSA_BACKEND_URL,
-  },
+  //admin: {
+    //disable: process.env.DISABLE_MEDUSA_ADMIN === 'true',
+    //backendUrl: process.env.MEDUSA_BACKEND_URL,
+ // },
 
   // ✅ Plugins
   plugins: [
