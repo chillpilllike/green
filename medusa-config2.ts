@@ -6,7 +6,10 @@ export default defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
-   // workerMode: 'server',
+    databaseDriverOptions: {
+      ssl: false,
+      sslmode: 'disable',
+    },
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -17,9 +20,8 @@ export default defineConfig({
   },
 
   admin: {
-    //disable: process.env.DISABLE_MEDUSA_ADMIN === 'true',
     backendUrl: process.env.MEDUSA_BACKEND_URL,
- },
+  },
 
   // ✅ Plugins
   plugins: [
@@ -34,7 +36,7 @@ export default defineConfig({
     {
       resolve: '@lambdacurry/medusa-product-reviews',
       options: {
-        defaultReviewStatus: 'pending', // optional
+        defaultReviewStatus: 'pending',
       },
     },
     {
