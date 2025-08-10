@@ -41,7 +41,6 @@
   "@medusajs/icons": "^2.1.3",
   "@mui/material": "^6.1.2",
   "react-hook-form": "^7.53.0",
-  "@emotion/react": "^11.13.3",
   "@emotion/styled": "^11.13.0",
   "pdfkit": "^0.15.1",
   "recharts": "^2.13.3",
